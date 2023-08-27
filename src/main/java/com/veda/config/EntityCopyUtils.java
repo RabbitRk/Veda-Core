@@ -1,4 +1,4 @@
-package com.veda.config.utils;
+package com.veda.config;
 
 import java.lang.reflect.Field;
 

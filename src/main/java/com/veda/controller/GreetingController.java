@@ -3,9 +3,11 @@ package com.veda.controller;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
-import com.veda.config.utils.EntityCopyUtils;
+import com.veda.config.EntityCopyUtils;
 import com.veda.entity.Greeting;
 import com.veda.repository.GreetingRepository;
 
@@ -22,8 +24,10 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+
 @Path("/api/greeting")
-@Tag(name = "greeting", description = "Greeting Operations")
+@Tag(name = "Greeting", description = "Greeting Operations")
+// @SecurityScheme(securitySchemeName = "jwt", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "jwt")
 public class GreetingController {
 
     @Inject
