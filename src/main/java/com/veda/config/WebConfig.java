@@ -2,7 +2,6 @@ package com.veda.config;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -11,13 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.veda.model.BaseResponseBuilder;
 import com.veda.model.User;
 import com.veda.service.Jwt.IJwtTokenUtil;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.PreMatching;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
@@ -25,6 +24,7 @@ import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
+@PreMatching
 public class WebConfig implements ContainerRequestFilter {
     @Inject
     IJwtTokenUtil jwtTokenUtil;
@@ -41,8 +41,7 @@ public class WebConfig implements ContainerRequestFilter {
         if (!EXCLUDED_PATHS.contains(info.getPath())) {
             Optional<User> user = getAuthentication(containerRequestContext.getHeaders());
             if (user.isEmpty()) {
-                Response response = Response.status(Response.Status.FORBIDDEN)
-                        .entity(new BaseResponseBuilder().ofError("Token error ").createBaseResponse()).build();
+                Response response = Response.status(Response.Status.FORBIDDEN).build();
                 containerRequestContext.abortWith(response);
                 return;
             }
@@ -65,7 +64,7 @@ public class WebConfig implements ContainerRequestFilter {
             }
             return Optional.of(user);
         } catch (RuntimeException e) {
-            LOG.error("error on token validation ", e);
+            LOG.error("Error on token validation ", e);
             return Optional.empty();
         }
 

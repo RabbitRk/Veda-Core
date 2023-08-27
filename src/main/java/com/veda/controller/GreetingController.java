@@ -11,6 +11,7 @@ import com.veda.config.EntityCopyUtils;
 import com.veda.entity.Greeting;
 import com.veda.repository.GreetingRepository;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -37,6 +38,7 @@ public class GreetingController {
     EntityCopyUtils entityCopyUtils;
 
     @GET
+    @RolesAllowed("Admin")
     public Response list() {
         Iterable<Greeting> greetings = springGreetingRepository.findAll();
         return Response.ok(greetings).status(200).build();
