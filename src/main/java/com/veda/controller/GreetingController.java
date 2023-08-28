@@ -5,10 +5,11 @@ import java.util.UUID;
 
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
-import com.veda.config.utils.EntityCopyUtils;
+import com.veda.config.EntityCopyUtils;
 import com.veda.entity.Greeting;
 import com.veda.repository.GreetingRepository;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -22,8 +23,10 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+
 @Path("/api/greeting")
-@Tag(name = "greeting", description = "Greeting Operations")
+@Tag(name = "Greeting", description = "Greeting Operations")
+// @SecurityScheme(securitySchemeName = "jwt", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "jwt")
 public class GreetingController {
 
     @Inject
@@ -33,6 +36,7 @@ public class GreetingController {
     EntityCopyUtils entityCopyUtils;
 
     @GET
+    @RolesAllowed("Admin")
     public Response list() {
         Iterable<Greeting> greetings = springGreetingRepository.findAll();
         return Response.ok(greetings).status(200).build();
