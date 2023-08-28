@@ -1,55 +1,60 @@
 package com.veda.controller.auth;
 
-import org.jboss.logmanager.Logger;
-
+import com.veda.entity.master.Profile;
+import com.veda.entity.master.Users;
 import com.veda.exception.UserNotFoundException;
-import com.veda.model.BaseResponse;
-import com.veda.model.BaseResponseBuilder;
-import com.veda.model.LoginRequest;
-import com.veda.model.LoginResponse;
-import com.veda.model.Status;
-import com.veda.model.User;
-import com.veda.model.UserBuilder;
-import com.veda.service.Jwt.IJwtTokenUtil;
-import com.veda.service.user.IUserService;
+import com.veda.model.auth.LoginRequest;
+import com.veda.model.auth.LoginResponse;
+import com.veda.model.auth.RefreshTokenRequest;
+import com.veda.model.auth.SignupRequest;
+import com.veda.service.auth.AuthService;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 
 @Path("/api/auth")
 public class AuthController {
 
-    private static final Logger LOG = Logger.getLogger("AuthController");
-
     @Inject
-    IJwtTokenUtil jwtTokenUtil;
-    @Inject
-    IUserService userService;
+    AuthService authService;
 
-    @GET
-    @Path("/token")
-    public String tokenGenerate() {
-        User user = new UserBuilder().setId("1").setName("test").setRoles("Admin").createUser();
-        return jwtTokenUtil.generateToken(user);
-    }
+    @POST
+    @Path("/authenticate")
+    public Response authenticate(LoginRequest login) throws UserNotFoundException {
 
-    @GET
-    @Path("/verify")
-    public User verification(@QueryParam("token") String token) {
-        return jwtTokenUtil.verifyToken(token);
+        LoginResponse response = authService.authenticate(login);
+
+        return Response.ok(response).build();
     }
 
     @POST
-    @Path("/login")
-    public Response login(LoginRequest login) throws UserNotFoundException {
+    @Path("/sign-up")
+    @Transactional
+    public Response signUp(@Valid SignupRequest signUp) {
 
-        LOG.info(login.getUserId());
+        Users users = authService.createUser(signUp);
 
-        final User user = userService.findUser(login.getUserId(), login.getPassword());
-        final String token = jwtTokenUtil.generateToken(user);
-        BaseResponse<LoginResponse> baseResponse = new BaseResponseBuilder<LoginResponse>()
-                .setData(new LoginResponse(token)).setStatus(Status.SUCCESS).createBaseResponse();
-        return Response.ok(baseResponse).build();
+        Profile profile = authService.createProfile(users);
+
+        return Response.ok(profile).build();
+    }
+
+    @POST
+    @Path("/refresh-token")
+    public Response refreshToken(RefreshTokenRequest refreshToken) throws UserNotFoundException {
+        LoginResponse response = authService.refreshToken(refreshToken);
+
+        return Response.ok(response).build();
+    }
+
+    @POST
+    @Path("/forgot-password")
+    public Response forgotPassword(RefreshTokenRequest refreshToken) {
+        // TODO: Pending Implementation
+        return Response.ok(refreshToken).build();
     }
 }
