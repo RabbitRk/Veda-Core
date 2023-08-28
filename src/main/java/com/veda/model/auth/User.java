@@ -1,22 +1,22 @@
-package com.veda.model;
+package com.veda.model.auth;
+
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.io.Serializable;
-import java.security.Principal;
-
 public class User implements Principal, Serializable {
     private String id;
-    private String roles;
+    private List<String> roles;
     private String name;
-    private String password;
 
     public User() {
     }
 
-    public User(String id, String roles, String name) {
+    public User(String id, List<String> roles, String name) {
         this.id = id;
         this.roles = roles;
         this.name = name;
@@ -69,19 +69,11 @@ public class User implements Principal, Serializable {
         this.name = name;
     }
 
-    public String getRoles() {
+    public List<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(String roles) {
+    public void setRoles(List<String> roles) {
         this.roles = roles;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

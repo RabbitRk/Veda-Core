@@ -1,90 +1,60 @@
 package com.veda.controller.auth;
 
-import java.security.SecureRandom;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Date;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.logmanager.Logger;
-
-import com.veda.entity.RefreshToken;
+import com.veda.entity.master.Profile;
+import com.veda.entity.master.Users;
 import com.veda.exception.UserNotFoundException;
-import com.veda.model.LoginRequest;
-import com.veda.model.LoginResponse;
-import com.veda.model.User;
-import com.veda.model.UserBuilder;
-import com.veda.service.Jwt.IJwtTokenUtil;
-import com.veda.service.user.IUserService;
+import com.veda.model.auth.LoginRequest;
+import com.veda.model.auth.LoginResponse;
+import com.veda.model.auth.RefreshTokenRequest;
+import com.veda.model.auth.SignupRequest;
+import com.veda.service.auth.AuthService;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
 @Path("/api/auth")
-public class AuthController { 
-
-    @ConfigProperty(name = "jwt.refreshToken.expiration-time")
-    int refreshTokenExpiryTime;
+public class AuthController {
 
     @Inject
-    IJwtTokenUtil jwtTokenUtil;
+    AuthService authService;
 
-    @Inject
-    IUserService userService;
+    @POST
+    @Path("/authenticate")
+    public Response authenticate(LoginRequest login) throws UserNotFoundException {
 
-    @GET
-    @Path("/token")
-    public String tokenGenerate() {
-        User user = new UserBuilder().setId("1").setName("test").setRoles("Admin").createUser();
-        return jwtTokenUtil.generateToken(user);
-    }
+        LoginResponse response = authService.authenticate(login);
 
-    @GET
-    @Path("/verify")
-    public User verification(@QueryParam("token") String token) {
-        return jwtTokenUtil.verifyToken(token);
+        return Response.ok(response).build();
     }
 
     @POST
-    @Path("/login")
-    public Response login(LoginRequest login) throws UserNotFoundException {
+    @Path("/sign-up")
+    @Transactional
+    public Response signUp(@Valid SignupRequest signUp) {
 
-        LocalDateTime now = LocalDateTime.now();
- 
-        final User user = userService.findUser(login.getUserId(), login.getPassword());
-        final String token = jwtTokenUtil.generateToken(user);
+        Users users = authService.createUser(signUp);
 
+        Profile profile = authService.createProfile(users);
 
-        
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setRefreshToken(generateRefreshToken());
-        refreshToken.setExpiryDate(Timestamp.valueOf(now.plusDays(refreshTokenExpiryTime)));
-        // TODO: Repo call for saving the refresh token with the expiry time - 7 days
-        // <>
-
-
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(token);
-        loginResponse.setRefreshToken(refreshToken.getRefreshToken());
-
-        return Response.ok(loginResponse).build();
+        return Response.ok(profile).build();
     }
 
+    @POST
+    @Path("/refresh-token")
+    public Response refreshToken(RefreshTokenRequest refreshToken) throws UserNotFoundException {
+        LoginResponse response = authService.refreshToken(refreshToken);
 
-    String generateRefreshToken() {
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] randomBytes = new byte[64];
-        secureRandom.nextBytes(randomBytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+        return Response.ok(response).build();
     }
 
-     private Date convertLocalDateTimeToDate(LocalDateTime now) {
-        return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+    @POST
+    @Path("/forgot-password")
+    public Response forgotPassword(RefreshTokenRequest refreshToken) {
+        // TODO: Pending Implementation
+        return Response.ok(refreshToken).build();
     }
 }

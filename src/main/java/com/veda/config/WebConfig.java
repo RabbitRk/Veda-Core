@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.veda.model.User;
+import com.veda.model.auth.User;
 import com.veda.service.Jwt.IJwtTokenUtil;
 
 import jakarta.inject.Inject;
@@ -31,8 +31,8 @@ public class WebConfig implements ContainerRequestFilter {
     private static Logger LOG = LoggerFactory.getLogger(WebConfig.class);
     private static String AUTHORIZATION = "Authorization";
 
-    private static final List<String> EXCLUDED_PATHS = Arrays.asList(
-            "/api/auth/login");
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList("/api/auth/sign-up", "/api/auth/forgot-password",
+            "/api/auth/authenticate", "/api/auth/refresh-token");
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
@@ -67,11 +67,10 @@ public class WebConfig implements ContainerRequestFilter {
             LOG.error("Error on token validation ", e);
             return Optional.empty();
         }
-
     }
 
     public static class JwtSecurityContext implements SecurityContext {
-        private final User user;
+        private final com.veda.model.auth.User user;
         private final boolean secured;
 
         public JwtSecurityContext(User user, boolean secured) {

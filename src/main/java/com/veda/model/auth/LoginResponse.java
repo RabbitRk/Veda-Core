@@ -1,4 +1,4 @@
-package com.veda.model;
+package com.veda.model.auth;
 
 import lombok.Getter;
 import lombok.Setter;

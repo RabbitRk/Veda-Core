@@ -3,8 +3,6 @@ package com.veda.controller;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
-import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import com.veda.config.EntityCopyUtils;

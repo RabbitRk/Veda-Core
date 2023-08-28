@@ -4,14 +4,14 @@ import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import com.veda.model.User;
-import com.veda.model.UserBuilder;
+import com.veda.model.auth.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -43,10 +43,28 @@ public class JwtTokenUtil implements IJwtTokenUtil {
         this.secret = key;
     }
 
+    public User verifyToken(String token) {
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
+                .parseClaimsJws(token).getBody();
+
+        User user = new User();
+        user.setId(claims.get(ID).toString());
+        user.setRoles((List<String>) claims.get(ROLES));
+        user.setName(claims.get(NAME).toString());
+
+        return user;
+    }
+
+    private Date convertLocalDateTimeToDate(LocalDateTime now) {
+        return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    @Override
     public String generateToken(User user) {
 
         // TODO: Implement Issuer
-
         LocalDateTime now = LocalDateTime.now();
         JwtBuilder builder = Jwts.builder()
                 .claim(ID, user.getId())
@@ -56,19 +74,5 @@ public class JwtTokenUtil implements IJwtTokenUtil {
                 .signWith(signatureAlgorithm, key);
         builder.setExpiration(convertLocalDateTimeToDate(now.plusMinutes(tokenExpiryTime)));
         return builder.compact();
-    }
-
-    public User verifyToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
-                .parseClaimsJws(token).getBody();
-        return new UserBuilder()
-                .setId(claims.get(ID).toString())
-                .setRoles(claims.get(ROLES).toString())
-                .setName(claims.get(NAME).toString()).createUser();
-    }
-
-    private Date convertLocalDateTimeToDate(LocalDateTime now) {
-        return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
     }
 }
