@@ -1,10 +1,14 @@
 package com.veda.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.veda.config.EntityCopyUtils;
 import com.veda.entity.Greeting;
@@ -28,6 +32,7 @@ import jakarta.ws.rs.core.Response;
 
 @Path("/api/greeting")
 @Tag(name = "Greeting", description = "Greeting Operations")
+@RolesAllowed("Admin")
 public class GreetingController {
 
     @Inject
@@ -89,6 +94,8 @@ public class GreetingController {
     @RolesAllowed("admin")
     public Response update(@PathParam("name") String name) {
 
+        // The code snippet is performing a native SQL query to retrieve a list of Greeting entities
+        // from the database based on a given name.
         Query query = entityManager.createNativeQuery(
                 "SELECT * FROM greeting where name like CONCAT('%', :greetingName, '%')",
                 Greeting.class);
@@ -102,4 +109,18 @@ public class GreetingController {
 
         throw new IllegalArgumentException("No Greeting is like " + name + " exists");
     }
+
+//    @POST
+//     @Path("/upload")
+//     @Consumes(MediaType.MULTIPART_FORM_DATA)
+//     public Response uploadFile(@MultipartForm FileUploadForm form) {
+//         try {
+//             String fileName = form.getFile().getFileName();
+//             Path destination = Path.of("src/main/resources/uploads", fileName);
+//             Files.copy(form.getFile().getData(), destination, StandardCopyOption.REPLACE_EXISTING);
+//             return Response.ok("File uploaded successfully").build();
+//         } catch (IOException e) {
+//             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+//         }
+//     }
 }
