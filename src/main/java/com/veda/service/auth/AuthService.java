@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -123,7 +124,7 @@ public class AuthService {
                 user.setId(users.get().getId().toString());
 
                 List<String> roles = users.get().getRoles().stream()
-                        .map(Roles::getRoleName).toList();
+                        .map(Roles::getRoleName).collect(Collectors.toList());
 
                 user.setRoles(roles);
             } else {
@@ -165,7 +166,7 @@ public class AuthService {
         user.setId(users.get().getId().toString());
 
         List<String> roles = users.get().getRoles().stream()
-                .map(Roles::getRoleName).toList();
+                .map(Roles::getRoleName).collect(Collectors.toList());
 
         user.setRoles(roles);
 
