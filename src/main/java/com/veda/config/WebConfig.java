@@ -31,13 +31,16 @@ public class WebConfig implements ContainerRequestFilter {
     private static Logger LOG = LoggerFactory.getLogger(WebConfig.class);
     private static String AUTHORIZATION = "Authorization";
 
-    private static final List<String> EXCLUDED_PATHS = Arrays.asList("/api/auth/sign-up", "/api/auth/forgot-password",
-            "/api/auth/authenticate", "/api/auth/refresh-token", "/api/greeting");
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList(
+            "/api/auth/sign-up", 
+            "/api/auth/forgot-password",
+            "/api/auth/authenticate", 
+            "/api/auth/refresh-token");
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
         UriInfo info = containerRequestContext.getUriInfo();
-        LOG.info("Url path ===> ", info.getPath());
+        LOG.info("Url path ===> "+ info.getPath());
         if (!EXCLUDED_PATHS.contains(info.getPath())) {
             Optional<User> user = getAuthentication(containerRequestContext.getHeaders());
             if (user.isEmpty()) {
@@ -69,6 +72,10 @@ public class WebConfig implements ContainerRequestFilter {
         }
     }
 
+    /*
+     * @Inject this JWT Security Context to get the principal name
+     * and other details
+     */
     public static class JwtSecurityContext implements SecurityContext {
         private final com.veda.model.auth.User user;
         private final boolean secured;
