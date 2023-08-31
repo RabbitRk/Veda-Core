@@ -32,7 +32,7 @@ public class WebConfig implements ContainerRequestFilter {
     private static String AUTHORIZATION = "Authorization";
 
     private static final List<String> EXCLUDED_PATHS = Arrays.asList("/api/auth/sign-up", "/api/auth/forgot-password",
-            "/api/auth/authenticate", "/api/auth/refresh-token");
+            "/api/auth/authenticate", "/api/auth/refresh-token", "/api/greeting");
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
