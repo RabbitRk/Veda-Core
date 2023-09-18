@@ -1,4 +1,4 @@
-package com.veda.service.Jwt;
+package com.veda.service.jwt;
 
 import java.security.Key;
 import java.time.LocalDateTime;

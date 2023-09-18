@@ -1,10 +1,5 @@
 package com.veda.controller.auth;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.veda.config.SecurityConfig;
-import com.veda.config.SecurityConfig.JwtSecurityContext;
 import com.veda.entity.master.Profile;
 import com.veda.entity.master.Users;
 import com.veda.exception.UserNotFoundException;
@@ -26,8 +21,6 @@ public class AuthController {
 
     @Inject
     AuthService authService;
-
-    private static Logger LOG = LoggerFactory.getLogger(AuthController.class);
 
     @POST
     @Path("/authenticate")

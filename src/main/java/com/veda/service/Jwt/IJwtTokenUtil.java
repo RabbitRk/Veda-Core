@@ -1,4 +1,4 @@
-package com.veda.service.Jwt;
+package com.veda.service.jwt;
 
 import com.veda.model.auth.User;
 

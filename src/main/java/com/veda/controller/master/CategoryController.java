@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 
 import com.veda.config.EntityCopyUtils;
 import com.veda.entity.master.Category;
-import com.veda.entity.master.Profile;
 import com.veda.repository.master.CategoryRepository;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -35,6 +34,6 @@ public class CategoryController {
         return Response.ok(categories).status(200).build();
     }
 
-    
+
 
 }

@@ -5,8 +5,6 @@ import com.veda.entity.master.Branch;
 import com.veda.entity.master.Category;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
