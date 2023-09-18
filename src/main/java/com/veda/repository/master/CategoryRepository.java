@@ -4,11 +4,11 @@ import java.util.UUID;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.veda.entity.master.Profile;
+import com.veda.entity.master.Category;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public interface ProfileRepository extends PagingAndSortingRepository<Profile, UUID>{
+public interface CategoryRepository extends PagingAndSortingRepository<Category, UUID>{
     
 }

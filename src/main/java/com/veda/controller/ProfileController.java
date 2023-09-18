@@ -7,8 +7,8 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.springframework.data.domain.PageRequest;
 
 import com.veda.config.EntityCopyUtils;
-import com.veda.entity.master.Users;
-import com.veda.repository.master.UserRepository;
+import com.veda.entity.master.Profile;
+import com.veda.repository.master.ProfileRepository;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -27,17 +27,13 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-/**
- * The UserController class is a Java class that represents the API endpoints
- * for managing global users.
- */
-@Path("/api/users")
+@Path("/api/profile")
 @RolesAllowed("Admin")
-@Tag(name = "Users", description = "Global Users Endpoints")
-public class UserController {
+@Tag(name = "Profiles", description = "Profile Endpoints")
+public class ProfileController {
 
     @Inject
-    UserRepository userRepository;
+    ProfileRepository profileRepository;
 
     @Inject
     EntityCopyUtils entityCopyUtils;
@@ -46,60 +42,61 @@ public class UserController {
     public Response list(
             @DefaultValue("0") @QueryParam("pageNo") int pageNo,
             @DefaultValue("25") @QueryParam("pageSize") int pageSize) {
-        Iterable<Users> user = userRepository.findAll(PageRequest.of(pageNo, pageSize));
+        Iterable<Profile> user = profileRepository.findAll(PageRequest.of(pageNo, pageSize));
         return Response.ok(user).status(200).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Response getByID(@PathParam("id") UUID id) {
+        Optional<Profile> optional = profileRepository.findById(id);
+
+        if (optional.isPresent()) {
+            Profile profile = optional.get();
+            return Response.ok(profile).status(200).build();
+        }
+
+        throw new IllegalArgumentException("No profile with id " + id + " exists");
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response add(Users users) {
-        if (users.id != null) {
+    public Response add(Profile profile) {
+        if (profile.id != null) {
             throw new WebApplicationException("Id was invalidly set on request.", 422);
         }
 
-        userRepository.save(users);
-        return Response.ok(users).status(201).build();
+        profileRepository.save(profile);
+        return Response.ok(profile).status(201).build();
     }
 
     @DELETE
     @Path("/{id}")
     @Transactional
     public Response delete(@PathParam("id") UUID id) {
-        Optional<Users> entity = userRepository.findById(id);
+        Optional<Profile> entity = profileRepository.findById(id);
         if (!entity.isPresent()) {
-            throw new WebApplicationException("users with id of " + id + " does not exist.", 404);
+            throw new WebApplicationException("profile with id of " + id + " does not exist.", 404);
         }
-        userRepository.delete(entity.get());
+        profileRepository.delete(entity.get());
         return Response.status(204).build();
     }
 
     @PUT
     @Path("/{id}")
-    public Response update(@PathParam("id") UUID id, Users greeting) {
-        Optional<Users> optional = userRepository.findById(id);
+    public Response update(@PathParam("id") UUID id, Profile greeting) {
+        Optional<Profile> optional = profileRepository.findById(id);
 
         if (optional.isPresent()) {
-            Users users = optional.get();
-            entityCopyUtils.copyProperties(users, greeting);
-            Users updateUsers = userRepository.save(users);
+            Profile profile = optional.get();
+            entityCopyUtils.copyProperties(profile, greeting);
+            Profile updateUsers = profileRepository.save(profile);
             return Response.ok(updateUsers).status(200).build();
         }
 
-        throw new IllegalArgumentException("No users with id " + id + " exists");
+        throw new IllegalArgumentException("No profile with id " + id + " exists");
     }
 
-    @GET
-    @Path("/{id}")
-    public Response getByID(@PathParam("id") UUID id) {
-        Optional<Users> optional = userRepository.findById(id);
-
-        if (optional.isPresent()) {
-            Users users = optional.get();
-            return Response.ok(users).status(200).build();
-        }
-
-        throw new IllegalArgumentException("No user with id " + id + " exists");
-    }
 }
